@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # Ensure a hostfile is specified
 if [ "$#" -ne 1 ]; then
