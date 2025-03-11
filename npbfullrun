@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Check if NUM parameter is provided
+if [ -z "$1" ]; then
+    echo "Error: Parameter # missing."
+    exit 1
+fi
+
+# Set the NUM value from the parameter
+NUM=$1
+
+# Validate the NUM value (uncomment this block if validation is needed)
+#if [[ ! "1 2 4 6 8" =~ (^|[[:space:]])$NUM($|[[:space:]]) ]]; then
+#    echo "Error: NUM must be one of 1, 2, 4, 6, or 8."
+#    exit 1
+#fi
+
+# Get today's date for MONTH and DAY
+MONTH=$(date +%m)
+DAY=$(date +%d)
+
+# Set the increments for n (1, 2, 4, 6, 8)
+n_values=(1 2 4 6 8)
+
+# Create the output directory if it doesn't exist
+OUTPUT_DIR="/home/project/outputfiles/npb"
+mkdir -p "$OUTPUT_DIR"
+
+# Initialize output file name
+OUTPUT_FILE="${OUTPUT_DIR}/${MONTH}${DAY}_Run_#_${NUM}.txt"
+
+# Run awsnpb with the provided NUM value
+echo "Running awsnpb with NUM=$NUM..."
+awsnpb.sh $NUM
+
+# Loop through the n values (1, 2, 4, 6, 8)
+for n in "${n_values[@]}"; do
+    # File to read from
+    INPUT_FILE="/home/project/NPBOutputs/${MONTH}${DAY}_${NUM}_n${n}.txt"
+
+    # Check if the file exists
+    if [[ -f "$INPUT_FILE" ]]; then
+        # Print the header to the output file
+        echo "n${n}#:" >> "$OUTPUT_FILE"
+        echo "n${n}#: Time in seconds, Mop/s total, Mop/s/process" >> "$OUTPUT_FILE"
+
+        # Extract and output the required lines
+        # Extract "Time in seconds", "Mop/s total", and "Mop/s/process" from the file
+        TIME=$(grep -i "Time in seconds" "$INPUT_FILE" | awk '{print $NF}')
+        MOPS_TOTAL=$(grep -i "Mop/s total" "$INPUT_FILE" | awk '{print $NF}')
+        MOPS_PROCESS=$(grep -i "Mop/s/process" "$INPUT_FILE" | awk '{print $NF}')
+
+        # Output to the console
+        echo "n${n}#: Time in seconds: $TIME, Mop/s total: $MOPS_TOTAL, Mop/s/process: $MOPS_PROCESS"
+
+        # Output to the output file
+        echo "n${n}#: Time in seconds: $TIME, Mop/s total: $MOPS_TOTAL, Mop/s/process: $MOPS_PROCESS" >> "$OUTPUT_FILE"
+    else
+        echo "Warning: $INPUT_FILE not found."
+    fi
+done
