@@ -38,7 +38,7 @@ done
 sudo mkdir -p /home/project/outputfiles
 
 # Define the output file path
-OUTPUT_FILE="/home/project/IOR-MPI/outputfiles/$NUM-run-$date.txt"
+OUTPUT_FILE="/home/project/outputfiles/ior/$NUM-run-$date.txt"
 
 # Extract and print the relevant sections from all generated files
 echo "Extracted IOR Benchmark Results:" | tee "$OUTPUT_FILE"
